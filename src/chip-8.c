@@ -88,8 +88,41 @@ int load_file(Chip8 *c8, char *filename, short offset) {
     return 0;
 }
 
+void dump_memory(Chip8 *c8) {
+    int i;
+    char b1, b2;
+    int row_count = 0;
+
+    for (i = 0; i < MEM_SIZE; i += 2) {
+        b1 = c8->mem[i];
+        b2 = c8->mem[i+1];
+        printf("%.2x%.2x ", b1, b2);
+        row_count +=1;
+        if (row_count > 8) {
+            printf("\n");
+            row_count = 0;
+        }
+    }
+}
+
+void dump_stack(Chip8 *c8) {
+    int i;
+    int row_count = 0;
+    for (i = c8->reg.sp ; i >= 0 ; --i) {
+        if (c8->reg.sp == i) {
+            printf("-> ");
+        }
+        else {
+            printf("   ");
+        }
+        printf("%3d: %.4x\n", i, c8->stack[i]);
+    }
+}
+
 int main(void) {
     init_device(&g_device);
     load_file(&g_device, "ibm_logo.ch8", 0x0200);
+    printf("\n");
+    dump_stack(&g_device);
     return 0;
 }
