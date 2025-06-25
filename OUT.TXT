@@ -1,0 +1,202 @@
+
+Wrote a total of 132 bytes into memory at offset 0x200
+Instruction is 00e0
+Clear screen
+Instruction is a22a
+Set the value of I to 22a
+Instruction is 600c
+Set register V0 to 0c
+Instruction is 6108
+Set register V1 to 08
+Instruction is d01f
+Draw at 000c, 0008, 15 rows from 022a
+Instruction is 7009
+Add 00 to register v9
+Instruction is a239
+Set the value of I to 239
+Instruction is d01f
+Draw at 0015, 0008, 15 rows from 0239
+Instruction is a248
+Set the value of I to 248
+Instruction is 7008
+Add 00 to register v8
+Instruction is d01f
+Draw at 001d, 0008, 15 rows from 0248
+Instruction is 7004
+Add 00 to register v4
+Instruction is a257
+Set the value of I to 257
+Instruction is d01f
+Draw at 0021, 0008, 15 rows from 0257
+Instruction is 7008
+Add 00 to register v8
+Instruction is a266
+Set the value of I to 266
+Instruction is d01f
+Draw at 0029, 0008, 15 rows from 0266
+Instruction is 7008
+Add 00 to register v8
+Instruction is a275
+Set the value of I to 275
+Instruction is d01f
+Draw at 0031, 0008, 15 rows from 0275
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228
+Instruction is 1228
+Jump to 228

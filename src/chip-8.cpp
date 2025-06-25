@@ -156,10 +156,14 @@ unsigned short Chip8::stack_pop(void) {
 }
 
 void Chip8::execute(unsigned short instruction) {
-    unsigned char prefix = (instruction & 0xff00) >> 8;
+    unsigned char prefix = (instruction & 0xf000) >> 12;
+    int reg, x_reg, y_reg, num_rows;
+    unsigned char cval;
+    unsigned short sval;
 
     switch (prefix) {
-        case 0x00:
+        // Two instructions: clear screen (0x00e0) and return subroutine (0x00ee)
+        case 0x0:
             switch (instruction) {
                 case 0x00e0:
                     printf("Clear screen\n");
@@ -173,35 +177,61 @@ void Chip8::execute(unsigned short instruction) {
                     break;
             }
             break;
-        case 0x01:
+        // Jump to the location specified by the lower 12 bits
+        case 0x1:
+            printf("Jump to %.3x\n", (instruction & 0x0fff));
+            regs.pc = (instruction & 0x0fff);
             break;
-        case 0x02:
+        // Call the subroutine specified by the lower 12 bits
+        case 0x2:
+            printf("Call subroutine at %.3x\n", (instruction & 0x0fff));
+            stack_push(regs.pc);
+            regs.pc = (instruction & 0x0fff);
             break;
-        case 0x03:
+        case 0x3:
             break;
-        case 0x04:
+        case 0x4:
             break;
-        case 0x05:
+        case 0x5:
             break;
-        case 0x06:
+        // 6XNN - set the value of register X to the value NN
+        case 0x6:
+            reg = (instruction & 0x0f00) >> 8;
+            cval = (instruction & 0x00ff);
+            printf("Set register V%x to %.2x\n", reg, cval);
+            regs.v[reg] = cval;
             break;
-        case 0x07:
+        // 7XNN - add the value of NN to register X (with no flags adjusted)
+        case 0x7:
+            reg = (instruction & 0x0f00) >> 8;
+            cval = (instruction & 0x00ff);
+            printf("Add %.2x to register v%x\n", reg, cval);
+            regs.v[reg] += cval;
             break;
-        case 0x08:
+        case 0x8:
             break;
-        case 0x09:
+        case 0x9:
             break;
-        case 0x0a:
+        // ANNN - set the value of I to NNN
+        case 0xa:
+            sval = (instruction & 0x0fff);
+            printf("Set the value of I to %.3x\n", sval);
+            regs.i = sval;
             break;
-        case 0x0b:
+        case 0xb:
             break;
-        case 0x0c:
+        case 0xc:
             break;
-        case 0x0d:
+        // DXYN - draw a sprite using the registers VX and VY, N rows
+        case 0xd:
+            x_reg = (instruction & 0x0f00) >> 8;
+            y_reg = (instruction & 0x00f0) >> 4;
+            num_rows = (instruction & 0x000f);
+            printf("Draw at %.4x, %.4x, %d rows from %.4x\n", regs.v[x_reg], regs.v[y_reg], num_rows, regs.i);
             break;
-        case 0x0e:
+        case 0xe:
             break;
-        case 0x0f:
+        case 0xf:
             break;
         default:
             printf("Illegal opcode: %.4x\n", instruction);
