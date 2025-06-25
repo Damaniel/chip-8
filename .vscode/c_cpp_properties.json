@@ -1,0 +1,65 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "cStandard": "gnu89",
+            "mergeConfigurations": false,
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/**",
+                    "C:\\Users\\Shaun\\Documents\\DOSBoxHD\\DJGPP\\INCLUDE"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        },
+        {
+            "name": "DOS Allegro",
+            "includePath": [
+                "c:\\Users\\shaun\\Documents\\DOSBoxHD\\PROJECTS\\SLAC\\CODE\\INC\\**",
+                "C:\\Users\\Shaun\\Documents\\DOSBoxHD\\DJGPP\\INCLUDE\\**",
+                "C:\\Users\\Shaun\\Documents\\DOSBoxHD\\DJGPP\\LANG\\CXX\\**",
+                "C:\\Users\\Shaun\\Documents\\DOSBoxHD\\DJGPP\\LANG\\CXX\\STD\\*"
+
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "cStandard": "c99",
+            "cppStandard": "c++98",
+            "mergeConfigurations": false,
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/**"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "compilerPath": "C:\\Users\\shaun\\Documents\\DOSBoxHD\\DJGPP\\bin\\gpp.exe"
+        },
+        {
+            "name": "DOS (Watcom)",
+            "includePath": [
+                "${workspaceFolder}/nonogram/INCLUDE",
+                "${workspaceFolder}/DamPBNAscii/INCLUDE",
+                "c:\\users\\shaun\\documents\\dosboxhd\\watcom\\h"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "__far=",
+                "__interrupt="
+            ],
+            "compilerPath": "c:\\users\\shaun\\documents\\dosboxhd\\watcom\\binw\\wcl.exe",
+            "cStandard": "c89"
+        }
+    ],
+    "version": 4
+}
