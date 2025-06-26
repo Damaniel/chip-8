@@ -13,6 +13,8 @@ typedef struct {
     unsigned short i;                   // Index register
     unsigned short sp;                  // Stack pointer
     unsigned short pc;                  // Program counter
+    unsigned char delay_timer;          // Delay timer
+    unsigned char sound_timer;          // Sound timer
 } RegisterSet;
 
 class Chip8 {

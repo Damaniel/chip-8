@@ -56,6 +56,8 @@ void Chip8::init_registers(void) {
     regs.i = 0;
     regs.sp = 0;
     regs.pc = PROGRAM_OFFSET;
+    regs.delay_timer = 0;
+    regs.sound_timer = 0;
 }
 
 void Chip8::init(void) {
@@ -391,13 +393,22 @@ void Chip8::execute(unsigned short instruction) {
             reg = (instruction & 0x0f00) >> 8;
             sval = (instruction & 0x00ff);
             switch (sval) {
+                // Set Vx to the value of the delay timer
                 case 0x07:
+                    reg = (instruction & 0x0f00) >> 8;
+                    regs.v[reg] = regs.delay_timer;
                     break;
                 case 0x0A:
                     break;
+                // Set the delay timer to the value in Vx
                 case 0x15:
+                    reg = (instruction & 0x0f00) >> 8;
+                    regs.delay_timer = regs.v[reg];
                     break;
+                // Set the sound timer to the value in Vx
                 case 0x18:
+                    reg = (instruction & 0x0f00) >> 8;
+                    regs.sound_timer = regs.v[reg];
                     break;
                 // Add Vx to I (VF not affected)
                 case 0x1E:
