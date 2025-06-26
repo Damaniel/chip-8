@@ -25,6 +25,7 @@ class Chip8 {
         void stack_push(unsigned short val);
         unsigned short stack_peek(void);
         unsigned short stack_pop(void);
+
     public:
         void init(void);
         int load_file(char *filename, short offset);

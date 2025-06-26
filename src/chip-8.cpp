@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "../include/chip-8.h"
+#include <stdlib.h>
 
 enum {
     V0, V1, V2, V3, V4, V5, V6, V7,
@@ -157,9 +158,9 @@ unsigned short Chip8::stack_pop(void) {
 
 void Chip8::execute(unsigned short instruction) {
     unsigned char prefix = (instruction & 0xf000) >> 12;
-    int reg, x_reg, y_reg, num_rows;
-    unsigned char cval;
-    unsigned short sval;
+    int idx, reg, reg2, x_reg, y_reg, num_rows;
+    unsigned char cval, rval, digit;
+    unsigned short sval, sval2;
 
     switch (prefix) {
         // Two instructions: clear screen (0x00e0) and return subroutine (0x00ee)
@@ -177,22 +178,41 @@ void Chip8::execute(unsigned short instruction) {
                     break;
             }
             break;
-        // Jump to the location specified by the lower 12 bits
+        // 1NNN - Jump to the location specified by the lower 12 bits
         case 0x1:
             printf("Jump to %.3x\n", (instruction & 0x0fff));
             regs.pc = (instruction & 0x0fff);
             break;
-        // Call the subroutine specified by the lower 12 bits
+        // 2NNN - Call the subroutine specified by the lower 12 bits
         case 0x2:
             printf("Call subroutine at %.3x\n", (instruction & 0x0fff));
             stack_push(regs.pc);
             regs.pc = (instruction & 0x0fff);
             break;
+        // 3XNN - Skip next if Vx == NN
         case 0x3:
+            reg = (instruction & 0x0f00) >> 8;
+            cval = (instruction & 0x00ff);
+            printf("Skip next if %.2x == %.2x\n", regs.v[reg], cval);
+            if (regs.v[reg] == cval) {
+                regs.pc += 2;
+            }
             break;
+        // 4XNN - Skip next if Vx != NN
         case 0x4:
+            reg = (instruction & 0x0f00) >> 8;
+            cval = (instruction & 0x00ff);
+            if (regs.v[reg] != cval) {
+                regs.pc += 2;
+            }
             break;
+        // 5XY0 - Skip next if Vx == Vy
         case 0x5:
+            reg = (instruction & 0xf00) >> 8;
+            reg2 = (instruction & 0x00f0) >> 4;
+            if (regs.v[reg] == regs.v[reg2]) {
+                regs.pc += 2;
+            }
             break;
         // 6XNN - set the value of register X to the value NN
         case 0x6:
@@ -208,9 +228,74 @@ void Chip8::execute(unsigned short instruction) {
             printf("Add %.2x to register v%x\n", reg, cval);
             regs.v[reg] += cval;
             break;
+        // 8XYN - assorted bit and assignment operations
         case 0x8:
+            reg = (instruction & 0x0f00) >> 8;
+            reg2 = (instruction & 0x00f0) >> 4;
+            cval = (instruction & 0x000f);
+            switch (cval) {
+                // Assignment (Vx = Vy)
+                case 0x0:
+                    regs.v[reg] = regs.v[reg2];
+                    break;
+                // OR (Vx |= Vy)
+                case 0x1:
+                    regs.v[reg] = regs.v[reg] | regs.v[reg2];
+                    break;
+                // AND (Vx &= Vy)
+                case 0x2:
+                    regs.v[reg] = regs.v[reg] & regs.v[reg2];
+                    break;
+                // XOR (Vx ^= Vy)
+                case 0x3:
+                    regs.v[reg] = regs.v[reg] ^ regs.v[reg2];
+                    break;
+                // Add with overflow (Vx += Vy)
+                case 0x4:
+                    if ((int)regs.v[reg] + (int)regs.v[reg2] > 255)
+                        regs.v[VF] = 1;
+                    else
+                        regs.v[VF] = 0;
+                    regs.v[reg] = regs.v[reg] + regs.v[reg2];
+                    break;
+                // Subtract with underflow (Vx -= Vy)
+                case 0x5:
+                    if (regs.v[reg] >= regs.v[reg2])
+                        regs.v[VF] = 1;
+                    else
+                        regs.v[VF] = 0;
+                    regs.v[reg] = regs.v[reg] - regs.v[reg2];
+                    break;
+                // Shift right, LSB goes into VF
+                case 0x6:
+                    regs.v[VF] = regs.v[reg] & 0x01;
+                    regs.v[reg] = regs.v[reg] >> 1;
+                    break;
+                // Subtract Vx from Vy and assign to Vx, set VF if underflow
+                case 0x7:
+                    if (regs.v[reg2] >= regs.v[reg])
+                        regs.v[VF] = 1;
+                    else
+                        regs.v[VF] = 0;
+                    regs.v[reg] = regs.v[reg2] - regs.v[reg];
+                    break;
+                // Shift left, MSB goes into VF
+                case 0xE:
+                    regs.v[VF] = regs.v[reg] & 0x80;
+                    regs.v[reg] = regs.v[reg] << 1;
+                    break;
+                default:
+                    printf("Unknown operation: %.4x\n", instruction);
+                    break;
+            }
             break;
+        // 9XY0 - skip if Vx != Vy
         case 0x9:
+            reg = (instruction & 0x0f00) >> 8;
+            reg2 = (instruction & 0x00f0) >> 4;
+            if (regs.v[reg] != regs.v[reg2]) {
+                regs.pc += 2;
+            }
             break;
         // ANNN - set the value of I to NNN
         case 0xa:
@@ -218,9 +303,17 @@ void Chip8::execute(unsigned short instruction) {
             printf("Set the value of I to %.3x\n", sval);
             regs.i = sval;
             break;
+        // BNNN - Jump to V0 + NNN
         case 0xb:
+            sval = (instruction & 0x0fff);
+            regs.pc = regs.v[V0] + sval;
             break;
+        // CXNN - set Vx to a random value AND NN
         case 0xc:
+            reg = (instruction & 0x0f00) >> 8;
+            cval = (instruction & 0x00ff);
+            rval = rand() % 256;
+            regs.v[reg] = rval & cval;
             break;
         // DXYN - draw a sprite using the registers VX and VY, N rows
         case 0xd:
@@ -229,9 +322,63 @@ void Chip8::execute(unsigned short instruction) {
             num_rows = (instruction & 0x000f);
             printf("Draw at %.4x, %.4x, %d rows from %.4x\n", regs.v[x_reg], regs.v[y_reg], num_rows, regs.i);
             break;
+        // EXXX - key operations (key up, key down)
         case 0xe:
             break;
+        // FXXX - miscellaneous functions (memory, timer, keys, bcd)
         case 0xf:
+            reg = (instruction & 0x0f00) >> 8;
+            sval = (instruction & 0x00ff);
+            switch (sval) {
+                case 0x07:
+                    break;
+                case 0x0A:
+                    break;
+                case 0x15:
+                    break;
+                case 0x18:
+                    break;
+                // Add Vx to I (VF not affected)
+                case 0x1E:
+                    cval = (instruction & 0x0f00) >> 8;
+                    regs.i += regs.v[cval];
+                    break;
+                // Set I to the location of the font sprite for the specified hex digit
+                case 0x29:
+                    cval = (instruction & 0x0f00) >> 8;
+                    regs.i = FONT_OFFSET + (5 * cval);
+                    break;
+                // Store the value of Vx as 3 BCD digits at I, I+1 and I+2
+                case 0x33:
+                    reg = (instruction & 0x0f00) >> 8;
+                    cval = regs.v[reg];
+                    // Extract the 1s digit
+                    digit = cval % 10;
+                    mem[regs.i + 2] = digit;
+                    cval = cval / 10;
+                    // Extract the 10s digit
+                    digit = cval % 10;
+                    mem[regs.i + 1] = digit;
+                    cval = cval / 10;
+                    // Extract the 100s digit
+                    digit = cval % 10;
+                    mem[regs.i] = digit;
+                    break;
+                // reg dump (to offset I, but I remains unchanged)
+                case 0x55:
+                    sval2 = regs.i;
+                    for (idx = 0; idx < reg; ++idx) {
+                        mem[sval2 + idx] = regs.v[idx];
+                    }
+                    break;
+                // reg load (from offset I, but I remains unchanged)
+                case 0x65:
+                    sval2 = regs.i;
+                    for(idx = 0; idx < reg; ++idx) {
+                        regs.v[idx] = mem[sval2 + idx];
+                    }
+                    break;
+            }
             break;
         default:
             printf("Illegal opcode: %.4x\n", instruction);
@@ -241,7 +388,9 @@ void Chip8::execute(unsigned short instruction) {
 void Chip8::run(void) {
     int i;
     unsigned short instruction;
+
     for(i = 0; i < 100; ++i) {
+        printf("- PC is at %.4x\n", regs.pc);
         instruction = fetch();
         printf("Instruction is %.4x\n", instruction);
         execute(instruction);
