@@ -5,6 +5,8 @@
 #define FONT_SIZE 80
 #define STACK_SIZE 256
 #define PROGRAM_OFFSET 0x0200
+#define CHIP_8_WIDTH    64
+#define CHIP_8_HEIGHT   32
 
 typedef struct {
     unsigned char v[NUM_REGISTERS];     // General registers
@@ -18,6 +20,7 @@ class Chip8 {
         RegisterSet regs;
         unsigned char mem[MEM_SIZE];
         unsigned short stack[STACK_SIZE];
+        unsigned char vmem[CHIP_8_WIDTH][CHIP_8_HEIGHT];
         void init_mem(void);
         void init_registers(void);
         unsigned short fetch(void);
@@ -31,5 +34,6 @@ class Chip8 {
         int load_file(char *filename, short offset);
         void dump_memory(void);
         void dump_stack(void);
+        void dump_vmem(void);
         void run(void);
 };

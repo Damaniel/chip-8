@@ -29,7 +29,7 @@ unsigned char font_data[] = {
 
 /* Clears the 4k of memory space and 512 byte stack and loads the font data */
 void Chip8::init_mem(void) {
-    int i;
+    int i, j;
 
     for (i = 0; i < MEM_SIZE; ++i) {
         mem[i] = 0;
@@ -39,6 +39,12 @@ void Chip8::init_mem(void) {
     }
     for (i = 0; i < FONT_SIZE; ++i) {
         mem[i + FONT_OFFSET] = font_data[i];
+    }
+
+    for (j = 0;j < CHIP_8_HEIGHT; ++j) {
+        for (i = 0; i < CHIP_8_WIDTH; ++i) {
+            vmem[i][j] = 0;
+        }
     }
 }
 
@@ -123,6 +129,21 @@ void Chip8::dump_stack(void) {
     }
 }
 
+void Chip8::dump_vmem(void) {
+    int i, j;
+    for (j = 0; j < CHIP_8_HEIGHT; ++j) {
+        for (i = 0; i < CHIP_8_WIDTH; ++i) {
+            if (vmem[i][j] == 0) {
+                printf(".");
+            }
+            else {
+                printf("X");
+            }
+        }
+        printf("\n");
+    }
+}
+
 unsigned short Chip8::fetch(void) {
     unsigned char b1, b2;
     unsigned short instruction;
@@ -158,9 +179,10 @@ unsigned short Chip8::stack_pop(void) {
 
 void Chip8::execute(unsigned short instruction) {
     unsigned char prefix = (instruction & 0xf000) >> 12;
-    int idx, reg, reg2, x_reg, y_reg, num_rows;
-    unsigned char cval, rval, digit;
-    unsigned short sval, sval2;
+    int idx, idx2, reg, reg2, x_reg, y_reg, num_rows;
+    unsigned char draw_x, draw_y;
+    unsigned char cval, cval2, rval, digit;
+    unsigned short sval, sval2, sprite_off;
 
     switch (prefix) {
         // Two instructions: clear screen (0x00e0) and return subroutine (0x00ee)
@@ -168,6 +190,11 @@ void Chip8::execute(unsigned short instruction) {
             switch (instruction) {
                 case 0x00e0:
                     printf("Clear screen\n");
+                    for (idx2 = 0;idx2 < CHIP_8_HEIGHT; ++idx2) {
+                        for (idx = 0; idx < CHIP_8_WIDTH; ++idx) {
+                            vmem[idx][idx2] = 0;
+                        }
+                    }
                     break;
                 case 0x00ee:
                     printf("Return to code at %.4x\n", stack_peek());
@@ -321,6 +348,40 @@ void Chip8::execute(unsigned short instruction) {
             y_reg = (instruction & 0x00f0) >> 4;
             num_rows = (instruction & 0x000f);
             printf("Draw at %.4x, %.4x, %d rows from %.4x\n", regs.v[x_reg], regs.v[y_reg], num_rows, regs.i);
+            // Start row and column are x and y mod width and height, respectively
+            draw_x = regs.v[x_reg] % CHIP_8_WIDTH;
+            draw_y = regs.v[y_reg] % CHIP_8_HEIGHT;
+            // Get the offset of the first row of the sprite
+            sprite_off = regs.i;
+            for(idx2 = 0; idx2 < num_rows; ++idx2) {
+                // If this row is on the screen...
+                if (draw_y + idx2 < CHIP_8_HEIGHT) {
+                    // Get the row of data
+                    cval = mem[sprite_off + idx2];
+                    // for each pixel
+                    for (idx = 0; idx < 8; ++idx) {
+                        // If this pixel is on the screen
+                        if (draw_x + idx < CHIP_8_WIDTH) {
+                            // extract the pixel value
+                            cval2 = (cval & 0x80) >> 7;
+                            // If set and the destination is set, clear the space and set VF to 1.
+                            // If the destination is clear, set the space
+                            // If the pixel is clear, do nothing.
+                            if (cval2 == 0x1) {
+                                if (vmem[draw_x + idx][draw_y + idx2] == 0x1) {
+                                    vmem[draw_x + idx][draw_y + idx2] = 0x0;
+                                    regs.v[VF] = 1;
+                                }
+                                else {
+                                    vmem[draw_x + idx][draw_y + idx2] = 0x1;
+                                }
+                            }
+                        }
+                        // Shift left to put the next pixel in the row into the MSB
+                        cval = cval << 1;
+                    }
+                }
+            }
             break;
         // EXXX - key operations (key up, key down)
         case 0xe:
