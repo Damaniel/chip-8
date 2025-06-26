@@ -61,10 +61,18 @@ void Chip8::init_registers(void) {
 }
 
 void Chip8::init(void) {
+    int idx;
+
     // Clear the memory
     init_mem();
+
     // Clear the registers
     init_registers();
+
+    // Clear the key state
+    for (idx = 0; idx < NUM_KEYS; ++idx) {
+        key_state[idx] = 0;
+    }
 }
 
 int Chip8::load_file(char *filename, short offset) {
@@ -387,6 +395,25 @@ void Chip8::execute(unsigned short instruction) {
             break;
         // EXXX - key operations (key up, key down)
         case 0xe:
+            sval = (instruction & 0x00ff);
+            reg = (instruction & 0x0f00) >> 8;
+            switch (sval) {
+                // Skip next if key in Vx is pressed
+                case 0x9E:
+                    if (key_state[regs.v[reg] & 0x0f] != 0) {
+                        regs.pc += 2;
+                    }
+                    break;
+                // Skip next if key in Vx is not pressed
+                case 0xA1:
+                    if (key_state[regs.v[reg] & 0x0f] == 0 ) {
+                        regs.pc += 2;
+                    }
+                    break;
+                default:
+                    printf("Unrecognized keyboard operation %.4x\n", instruction);
+                    break;
+            }
             break;
         // FXXX - miscellaneous functions (memory, timer, keys, bcd)
         case 0xf:
@@ -398,7 +425,17 @@ void Chip8::execute(unsigned short instruction) {
                     reg = (instruction & 0x0f00) >> 8;
                     regs.v[reg] = regs.delay_timer;
                     break;
+                // Block until a key is pressed and then set Vx to the key pressed
+                // The 'block' is performed by pushing the PC back so that this
+                // instruction is run again until a key press shows up
                 case 0x0A:
+                    if (is_key_pressed) {
+                        regs.v[reg] = key_pressed;
+                        is_key_pressed = 0;
+                    }
+                    else {
+                        regs.pc -= 2;
+                    }
                     break;
                 // Set the delay timer to the value in Vx
                 case 0x15:
